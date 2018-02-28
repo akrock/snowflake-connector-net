@@ -13,14 +13,17 @@ namespace Snowflake.Data.Core
 {
     class HttpUtil
     {
-        static public HttpClient initHttpClient(TimeSpan timeout)
+        public static HttpClient initHttpClient(TimeSpan timeout)
         {
             // enforce tls v1.2
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             ServicePointManager.UseNagleAlgorithm = false;
             ServicePointManager.CheckCertificateRevocationList = true;
 
-            return new HttpClient(new RetryHandler(new HttpClientHandler())) { Timeout  = timeout };
+            return new HttpClient(new RetryHandler(new HttpClientHandler()))
+            {
+                Timeout  = timeout
+            };
         }
 
         class RetryHandler : DelegatingHandler
@@ -30,7 +33,7 @@ namespace Snowflake.Data.Core
             internal RetryHandler(HttpMessageHandler innerHandler) : base(innerHandler)
             {
             }
-
+            
             protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage,
                 CancellationToken cancellationToken)
             {
