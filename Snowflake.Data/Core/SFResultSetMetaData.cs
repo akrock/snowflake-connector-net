@@ -108,7 +108,8 @@ namespace Snowflake.Data.Core
 
         private SFDataType GetSFDataType(string type)
         {
-            if (Enum.TryParse(type, true, out SFDataType rslt))
+            SFDataType rslt;
+            if (Enum.TryParse(type, true, out rslt))
                 return rslt;
 
             throw new SnowflakeDbException(SFError.INTERNAL_ERROR,
@@ -135,7 +136,7 @@ namespace Snowflake.Data.Core
                 case SFDataType.TIMESTAMP_TZ:
                     return typeof(DateTimeOffset);
                 case SFDataType.BINARY:
-                    return typeof(byte);
+                    return typeof(byte[]);
                 case SFDataType.BOOLEAN:
                     return typeof(bool);
                 default:

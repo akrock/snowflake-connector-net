@@ -41,28 +41,7 @@ namespace Snowflake.Data.Core
         {
             get { return instance; }
         }
-
-        public JObject post(SFRestRequest postRequest)
-        {
-            var json = JsonConvert.SerializeObject(postRequest.jsonBody);
-            HttpContent httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, postRequest.uri);
-            message.Properties["TIMEOUT_PER_HTTP_REQUEST"] = postRequest.httpRequestTimeout;
-
-            message.Content = httpContent;
-            message.Content.Headers.ContentType = applicationJson;
-            message.Headers.Add(SF_AUTHORIZATION_HEADER, postRequest.authorizationToken);
-            message.Headers.Accept.Add(applicationSnowflake);
-
-            var responseContent = sendRequest(message, postRequest.sfRestRequestTimeout).Content;
-
-            var jsonString = responseContent.ReadAsStringAsync();
-            jsonString.Wait();
-
-            return JObject.Parse(jsonString.Result);
-        }
-
+        
         public T Post<T>(SFRestRequest postRequest)
         {
             //Run synchronous in a new thread-pool task.
@@ -134,19 +113,23 @@ namespace Snowflake.Data.Core
         
         private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, TimeSpan timeout)
         {
-            var response = await HttpUtil.initHttpClient(timeout).SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(timeout);
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
 
-            return response;
+            try
+            {
+                var response = await HttpUtil.getHttpClient().SendAsync(request, cancellationToken);
+                response.EnsureSuccessStatusCode();
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                throw cancellationToken.IsCancellationRequested ? new SnowflakeDbException(SFError.REQUEST_TIMEOUT) 
+                    : e;
+            }
         }
-
-        private HttpResponseMessage sendRequest(HttpRequestMessage requestMessage, TimeSpan timeout)
-        {
-            var response = HttpUtil.initHttpClient(timeout).SendAsync(requestMessage)
-                .Result.EnsureSuccessStatusCode();
-
-            return response;
-        }
+        
     }
 
 }

@@ -3,9 +3,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Snowflake.Data.Core
@@ -27,7 +24,9 @@ namespace Snowflake.Data.Core
 
         internal T GetValue<T>(int columnIndex)
         {
-            return (T) GetValue(columnIndex);
+            string val = getObjectInternal(columnIndex);
+            var types = sfResultSetMetaData.GetTypesByIndex(columnIndex);
+            return (T) SFDataConverter.ConvertToCSharpVal(val, types.Item1, typeof(T));
         }
 
         internal string GetString(int columnIndex)
@@ -37,11 +36,12 @@ namespace Snowflake.Data.Core
             {
                 case SFDataType.DATE:
                     var val = GetValue(columnIndex);
-                    if (val == null)
+                    if (val == DBNull.Value)
                         return null;
                     return SFDataConverter.toDateString((DateTime)val, 
                         sfResultSetMetaData.dateOutputFormat);
-                //TODO: Feels like were missing some implementations here, at least for time?
+                //TODO: Implement SqlFormat for timestamp type, aka parsing format specified by user and format the value
+
                 default:
                     return getObjectInternal(columnIndex); 
             }
