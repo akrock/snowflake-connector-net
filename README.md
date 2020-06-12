@@ -235,4 +235,3 @@ If you are using the .NET driver please take the following action:
 3. Delete any logs collected thus far and make sure that all copies are deleted. 
 4. If you cannot upgrade for any reason, please ensure all debugging is disabled
 5. If you are concerned about a potential compromise, contact Snowflake Customer Support for assistance with invalidating all active sessions/tokens. 
-
