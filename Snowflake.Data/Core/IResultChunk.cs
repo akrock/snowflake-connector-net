@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Snowflake.Data.Core
 {
-    public interface IResultChunk
+    public interface IResultChunk : IDisposable
     {
         string ExtractCell(int rowIndex, int columnIndex);
 

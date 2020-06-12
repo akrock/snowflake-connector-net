@@ -19,7 +19,7 @@ namespace Snowflake.Data.Tests
             string data = "[ [\"1\", \"1.234\", \"abcde\"],  [\"2\", \"5.678\", \"fghi\"] ]";
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Stream stream = new MemoryStream(bytes);
-            IChunkParser parser = new ReusableChunkParser(stream);
+            var parser = new ReusableChunkParser(stream);
 
             ExecResponseChunk chunkInfo = new ExecResponseChunk()
             {
@@ -47,7 +47,7 @@ namespace Snowflake.Data.Tests
             string data = "[ [null, \"1.234\", null],  [\"2\", null, \"fghi\"] ]";
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Stream stream = new MemoryStream(bytes);
-            IChunkParser parser = new ReusableChunkParser(stream);
+            var parser = new ReusableChunkParser(stream);
 
             ExecResponseChunk chunkInfo = new ExecResponseChunk()
             {
@@ -75,7 +75,7 @@ namespace Snowflake.Data.Tests
             string data = "[ [null, \"2019-08-21T11:58:00\", null],  [\"2\", null, \"fghi\"] ]";
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Stream stream = new MemoryStream(bytes);
-            IChunkParser parser = new ReusableChunkParser(stream);
+            var parser = new ReusableChunkParser(stream);
 
             ExecResponseChunk chunkInfo = new ExecResponseChunk()
             {
@@ -103,7 +103,7 @@ namespace Snowflake.Data.Tests
             string data = "[ [\"\\\\åäö\\nÅÄÖ\\r\", \"1.234\", null],  [\"2\", null, \"fghi\"] ]";
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Stream stream = new MemoryStream(bytes);
-            IChunkParser parser = new ReusableChunkParser(stream);
+            var parser = new ReusableChunkParser(stream);
 
             ExecResponseChunk chunkInfo = new ExecResponseChunk()
             {
@@ -132,7 +132,7 @@ namespace Snowflake.Data.Tests
             string data = "[ [\"åäö\\nÅÄÖ\\r\", \"1.234\", null],  [\"2\", null, \"" + longstring + "\"] ]";
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Stream stream = new MemoryStream(bytes);
-            IChunkParser parser = new ReusableChunkParser(stream);
+            var parser = new ReusableChunkParser(stream);
 
             ExecResponseChunk chunkInfo = new ExecResponseChunk()
             {
@@ -161,7 +161,7 @@ namespace Snowflake.Data.Tests
             string data = "[ [\"åäö\\";
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Stream stream = new MemoryStream(bytes);
-            IChunkParser parser = new ReusableChunkParser(stream);
+            var parser = new ReusableChunkParser(stream);
 
             ExecResponseChunk chunkInfo = new ExecResponseChunk()
             {
@@ -191,7 +191,7 @@ namespace Snowflake.Data.Tests
             string data = "[ [\"åäö";
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Stream stream = new MemoryStream(bytes);
-            IChunkParser parser = new ReusableChunkParser(stream);
+            var parser = new ReusableChunkParser(stream);
 
             ExecResponseChunk chunkInfo = new ExecResponseChunk()
             {

@@ -50,10 +50,8 @@ namespace Snowflake.Data.Core
         internal void resetChunkInfo(IResultChunk nextChunk)
         {
             Logger.Debug($"Recieved chunk #{nextChunk.GetChunkIndex() + 1} of {_totalChunkCount}");
-            if (_currentChunk is SFResultChunk)
-            {
-                ((SFResultChunk)_currentChunk).rowSet = null;
-            }
+            
+            _currentChunk.Dispose();
             _currentChunk = nextChunk;
             _currentChunkRowIdx = 0;
             _currentChunkRowCount = _currentChunk.GetRowCount();

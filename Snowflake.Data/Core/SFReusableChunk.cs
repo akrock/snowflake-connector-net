@@ -8,9 +8,8 @@ using System.Text;
 
 namespace Snowflake.Data.Core
 {
-    class SFReusableChunk : IResultChunk
+    class SFReusableChunk : IResultChunk, IResultChunkBuilder
     {
-       
         public int RowCount { get; set; }
 
         public int ColCount { get; set; }
@@ -82,7 +81,9 @@ namespace Snowflake.Data.Core
             int savedColCount;
 
             internal BlockResultData()
-            { }
+            {
+                
+            }
 
             internal void Reset(int rowCount, int colCount, int uncompressedSize)
             {
@@ -218,6 +219,11 @@ namespace Snowflake.Data.Core
                     lengths.Add(new int[1 << metaBlockLengthBits]);
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            // No-op this is designed to be reused.
         }
     }
 }

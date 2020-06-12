@@ -3,13 +3,11 @@
  */
 
 using System.IO;
-using Newtonsoft.Json;
+using Snowflake.Data.Client;
 
 namespace Snowflake.Data.Core
 {
-    using Snowflake.Data.Client;
-
-    public class FastStreamWrapper
+    internal class FastStreamWrapper
     {
         Stream wrappedStream;
         byte[] buffer = new byte[32768];
@@ -54,7 +52,7 @@ namespace Snowflake.Data.Core
         }
     }
 
-    public class ReusableChunkParser : IChunkParser
+    internal class ReusableChunkParser
     {
         // Very fast parser, only supports strings and nulls
         // Never generates parsing errors
@@ -66,10 +64,8 @@ namespace Snowflake.Data.Core
             this.stream = stream;
         }
 
-        public void ParseChunk(IResultChunk chunk)
+        public void ParseChunk(IResultChunkBuilder chunk)
         {
-            SFReusableChunk rc = (SFReusableChunk)chunk;
-
             bool inString = false;
             int c;
             var input = new FastStreamWrapper(stream);
@@ -87,7 +83,7 @@ namespace Snowflake.Data.Core
                     }
                     else if (c == 'n')
                     {
-                        rc.AddCell(null, 0);
+                        chunk.AddCell(null, 0);
                     }
                     // ignore anything else
                 }
@@ -97,7 +93,7 @@ namespace Snowflake.Data.Core
                     // Anything else is saved in the buffer
                     if (c == '"')
                     {
-                        rc.AddCell(ms.GetBuffer(), (int)ms.Length);
+                        chunk.AddCell(ms.GetBuffer(), (int)ms.Length);
                         ms.SetLength(0);
                         inString = false;
                     }

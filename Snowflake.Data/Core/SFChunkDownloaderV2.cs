@@ -103,7 +103,7 @@ namespace Snowflake.Data.Core
 
         public Task<IResultChunk> GetNextChunkAsync()
         {
-            if (_downloadTasks.IsAddingCompleted)
+            if (_downloadTasks.IsCompleted)
             {
                 return Task.FromResult<IResultChunk>(null);
             }

@@ -55,6 +55,11 @@ namespace Snowflake.Data.Core
         {
             return ChunkIndex;
         }
+
+        public void Dispose()
+        {
+            rowSet = null;
+        }
     }
 
     public enum DownloadState

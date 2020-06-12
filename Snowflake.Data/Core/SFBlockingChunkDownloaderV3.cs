@@ -161,9 +161,9 @@ namespace Snowflake.Data.Core
         /// </summary>
         /// <param name="content"></param>
         /// <param name="resultChunk"></param>
-        private void ParseStreamIntoChunk(Stream content, IResultChunk resultChunk)
+        private void ParseStreamIntoChunk(Stream content, IResultChunkBuilder resultChunk)
         {
-            IChunkParser parser = new ReusableChunkParser(content);
+            var parser = new ReusableChunkParser(content);
             parser.ParseChunk(resultChunk);
         }
     }

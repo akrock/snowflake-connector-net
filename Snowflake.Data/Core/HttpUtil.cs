@@ -40,7 +40,10 @@ namespace Snowflake.Data.Core
             ServicePointManager.CheckCertificateRevocationList = true;
 
             // Control how many simultaneous connections to each host are allowed from this client
-            ServicePointManager.DefaultConnectionLimit = 20;
+            if (ServicePointManager.DefaultConnectionLimit < 20)
+            {
+                ServicePointManager.DefaultConnectionLimit = 20;
+            }
 
             HttpUtil.httpClient = new HttpClient(new RetryHandler(new HttpClientHandler(){
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
