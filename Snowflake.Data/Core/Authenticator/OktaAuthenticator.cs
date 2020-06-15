@@ -66,16 +66,20 @@ namespace Snowflake.Data.Core.Authenticator
 
             logger.Debug("step 4: get SAML reponse from sso");
             var samlRestRequest = BuildSAMLRestRequest(ssoUrl, onetimeToken);
-            var samlRawResponse = await session.restRequester.GetAsync(samlRestRequest, cancellationToken).ConfigureAwait(false);
-            var samlRawHtmlString = await samlRawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+            using (var samlRawResponse = await session.restRequester.GetAsync(samlRestRequest, cancellationToken)
+                .ConfigureAwait(false))
+            {
+                var samlRawHtmlString = await samlRawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            logger.Debug("step 5: verify postback url in SAML reponse");
-            VerifyPostbackUrl(samlRawHtmlString);
+                logger.Debug("step 5: verify postback url in SAML reponse");
+                VerifyPostbackUrl(samlRawHtmlString);
 
-            logger.Debug("step 6: send SAML reponse to snowflake to login");
-            var loginRestRequest = BuildOktaLoginRestRequest(samlRawHtmlString);
-            var authnResponse = await session.restRequester.PostAsync<LoginResponse>(loginRestRequest, cancellationToken).ConfigureAwait(false);
-            session.ProcessLoginResponse(authnResponse);   
+                logger.Debug("step 6: send SAML reponse to snowflake to login");
+                var loginRestRequest = BuildOktaLoginRestRequest(samlRawHtmlString);
+                var authnResponse = await session.restRequester
+                    .PostAsync<LoginResponse>(loginRestRequest, cancellationToken).ConfigureAwait(false);
+                session.ProcessLoginResponse(authnResponse);
+            }
         }
 
         void IAuthenticator.Authenticate()
@@ -102,16 +106,18 @@ namespace Snowflake.Data.Core.Authenticator
 
             logger.Debug("step 4: get SAML reponse from sso");
             var samlRestRequest = BuildSAMLRestRequest(ssoUrl, onetimeToken);
-            var samlRawResponse = session.restRequester.Get(samlRestRequest);
-            var samlRawHtmlString = Task.Run(async () => await samlRawResponse.Content.ReadAsStringAsync()).Result;
+            using (var samlRawResponse = session.restRequester.Get(samlRestRequest))
+            {
+                var samlRawHtmlString = Task.Run(async () => await samlRawResponse.Content.ReadAsStringAsync()).Result;
 
-            logger.Debug("step 5: verify postback url in SAML reponse");
-            VerifyPostbackUrl(samlRawHtmlString);
+                logger.Debug("step 5: verify postback url in SAML reponse");
+                VerifyPostbackUrl(samlRawHtmlString);
 
-            logger.Debug("step 6: send SAML reponse to snowflake to login");
-            var loginRestRequest = BuildOktaLoginRestRequest(samlRawHtmlString);
-            var authnResponse = session.restRequester.Post<LoginResponse>(loginRestRequest);
-            session.ProcessLoginResponse(authnResponse);   
+                logger.Debug("step 6: send SAML reponse to snowflake to login");
+                var loginRestRequest = BuildOktaLoginRestRequest(samlRawHtmlString);
+                var authnResponse = session.restRequester.Post<LoginResponse>(loginRestRequest);
+                session.ProcessLoginResponse(authnResponse);
+            }
         }
 
         private SFRestRequest BuildAuthenticatorRestRequest()

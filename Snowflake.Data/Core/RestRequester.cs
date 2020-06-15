@@ -55,9 +55,12 @@ namespace Snowflake.Data.Core
         {
             var req = request.ToRequestMessage(HttpMethod.Post);
 
-            var response = await SendAsync(req, request.GetRestTimeout(), cancellationToken).ConfigureAwait(false);
-            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<T>(json);
+            using (var response =
+                await SendAsync(req, request.GetRestTimeout(), cancellationToken).ConfigureAwait(false))
+            {
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<T>(json);
+            }
         }
 
         public T Get<T>(IRestRequest request)
@@ -68,9 +71,11 @@ namespace Snowflake.Data.Core
 
         public async Task<T> GetAsync<T>(IRestRequest request, CancellationToken cancellationToken)
         {
-            HttpResponseMessage response = await GetAsync(request, cancellationToken).ConfigureAwait(false);
-            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return JsonConvert.DeserializeObject<T>(json);
+            using (var response = await GetAsync(request, cancellationToken).ConfigureAwait(false))
+            {
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<T>(json);
+            }
         }
         
         public Task<HttpResponseMessage> GetAsync(IRestRequest request, CancellationToken cancellationToken)
@@ -99,13 +104,13 @@ namespace Snowflake.Data.Core
 
             try
             {
-#if NET46
+//#if NET46
                 // The following optimization is going to cause test failure in net core 2.0 when testing against Azure deployment
                 // We might want to revisit when we upgrade the framework.
                 var response = await HttpUtil.getHttpClient().SendAsync(request, HttpCompletionOption.ResponseHeadersRead, linkedCts.Token).ConfigureAwait(false);
-#else
-                var response = await HttpUtil.getHttpClient().SendAsync(request, linkedCts.Token).ConfigureAwait(false);
-#endif
+//#else
+//                var response = await HttpUtil.getHttpClient().SendAsync(request, linkedCts.Token).ConfigureAwait(false);
+//#endif
                 response.EnsureSuccessStatusCode();
 
                 return response;

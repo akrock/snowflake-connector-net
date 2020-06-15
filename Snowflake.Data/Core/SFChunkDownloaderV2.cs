@@ -130,23 +130,26 @@ namespace Snowflake.Data.Core
                 chunkHeaders = downloadContext.chunkHeaders
             };
 
-            var httpResponse = await restRequester.GetAsync(downloadRequest, downloadContext.cancellationToken).ConfigureAwait(false);
-            Stream stream = await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
-
-            if (httpResponse.Content.Headers.TryGetValues("Content-Encoding", out var encoding))
+            using (var httpResponse = await restRequester.GetAsync(downloadRequest, downloadContext.cancellationToken)
+                .ConfigureAwait(false))
             {
-                if (string.Equals(encoding.First(), "gzip", StringComparison.OrdinalIgnoreCase))
+                Stream stream = await httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+                if (httpResponse.Content.Headers.TryGetValues("Content-Encoding", out var encoding))
                 {
-                    stream = new GZipStream(stream, CompressionMode.Decompress);
+                    if (string.Equals(encoding.First(), "gzip", StringComparison.OrdinalIgnoreCase))
+                    {
+                        stream = new GZipStream(stream, CompressionMode.Decompress);
+                    }
                 }
+
+                parseStreamIntoChunk(stream, chunk);
+
+                chunk.downloadState = DownloadState.SUCCESS;
+                logger.Info($"Succeed downloading chunk #{downloadContext.chunkIndex + 1}");
+
+                return chunk;
             }
-
-            parseStreamIntoChunk(stream, chunk);
-            
-            chunk.downloadState = DownloadState.SUCCESS;
-            logger.Info($"Succeed downloading chunk #{downloadContext.chunkIndex+1}");
-
-            return chunk;
         }
 
         
